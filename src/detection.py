@@ -70,7 +70,7 @@ signs_dict = {
 # picture path
 # equation_path = 'equation_2.jpg'
 # equation_path = 'linear_equation_system.jpg'
-equation_path = '../equations/handwritten_system.png'
+equation_path = '../equations/eq1.png'
 # equation_path = sys.argv[1]
 # read image
 image = cv2.imread(equation_path)
@@ -237,7 +237,7 @@ for math_eq in equations:
 
         img = cv2.imread("../images/" + math_sign.name + str(cnt) + ".jpg")
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # img = cv2.bitwise_not(img)
+        img = cv2.bitwise_not(img)
 
         resized_img = cv2.resize(img, dsize=(45, 45), interpolation=cv2.INTER_CUBIC)
         cv2.imwrite(("../images/" + math_sign.name + str(cnt) + ".jpg"), resized_img)
