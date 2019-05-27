@@ -68,10 +68,7 @@ signs_dict = {
     "div": 46
 }
 # picture path
-# equation_path = 'equation_2.jpg'
-# equation_path = 'linear_equation_system.jpg'
-equation_path = '../equations/eq1.png'
-# equation_path = sys.argv[1]
+equation_path = '../equations/eq3.png'
 # read image
 image = cv2.imread(equation_path)
 # convert color to gray
@@ -161,7 +158,7 @@ polygon = BoundingBox(0, len(image), 0, len(image[0]))
 points = mass_centers
 
 v = Algorithm(polygon)
-v.create_diagram(points=points, vis_steps=False, verbose=False, vis_result=True, vis_tree=False, vis_before_clipping=False)
+v.create_diagram(points=points, vis_steps=False, verbose=False, vis_result=False, vis_tree=False, vis_before_clipping=False)
 
 ###############
 points_with_bounding_vertices = v.points
@@ -222,11 +219,38 @@ for math_eq in equations:
             if y_i > max_y:
                 max_y = y_i
 
-        max_axis_val = max((max_y - min_y) + 1, (max_x - min_x) + 1)
-        sign_arr = np.zeros(shape=((max_y - min_y) + 1, (max_x - min_x) + 1), dtype=int)
+        y_diff = (max_y - min_y) + 1
+        x_diff = (max_x - min_x) + 1
+
+        max_axis_val = max(y_diff, x_diff)
+        min_axis_val = min(y_diff, x_diff)
+        sign_arr = np.zeros(shape=(max_axis_val, max_axis_val), dtype=int)
+
+        l = int(((max_axis_val - min_axis_val) + 1) / 2)
 
         for (y_i, x_i) in sign_points_set:
-            sign_arr[y_i - min_y][x_i - min_x] = 255
+            if (y_diff > x_diff):
+                # print("Max x:", max_x,
+                #       "Max y:", max_y,
+                #       "Min x:", min_x,
+                #       "Min y:", min_y,
+                #       "Max axis val:", max_axis_val,
+                #       "Min axis val:", min_axis_val,
+                #       "x:", x_i,
+                #       "y:", y_i,
+                #       "l:", l)
+                sign_arr[(y_i - min_y)][(x_i - min_x) + l] = 255
+            else: # if max_y <= max_x
+                # print("Max x:", max_x,
+                #       "Max y:", max_y,
+                #       "Min x:", min_x,
+                #       "Min y:", min_y,
+                #       "Max axis val:", max_axis_val,
+                #       "Min axis val:", min_axis_val,
+                #       "x:", x_i,
+                #       "y:", y_i,
+                #       "l:", l)
+                sign_arr[(y_i - min_y) + l][(x_i - min_x)] = 255
 
         # sign_arr = cv2.bitwise_not(sign_arr)
         for i in range(len(sign_arr)):
@@ -237,10 +261,12 @@ for math_eq in equations:
 
         img = cv2.imread("../images/" + math_sign.name + str(cnt) + ".jpg")
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = cv2.bitwise_not(img)
 
         resized_img = cv2.resize(img, dsize=(45, 45), interpolation=cv2.INTER_CUBIC)
+        # save result
         cv2.imwrite(("../images/" + math_sign.name + str(cnt) + ".jpg"), resized_img)
+
+        resized_img = cv2.bitwise_not(resized_img)
         ##############
 
         reshaped_final_img = np.array([np.reshape(np.array(resized_img), (45, 45, 1))])  # for convolution model
